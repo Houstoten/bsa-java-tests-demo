@@ -6,6 +6,8 @@ import com.example.demo.dto.SpendingResponse;
 import com.example.demo.model.SpendingEntity;
 import com.example.demo.repository.SpendingRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -16,10 +18,13 @@ import java.util.stream.Collectors;
 @Service
 public class SpendingService {
 
-    @Autowired
     private SpendingRepository spendingRepository;
 
-    public List<SpendingResponse> spendSomeMoney(List<SpendingRequest> spendingList) {
+    public SpendingService(SpendingRepository spendingRepository) {
+        this.spendingRepository = spendingRepository;
+    }
+
+    public List<SpendingResponse> spendSomeMoney(List<SpendingRequest> spendingList) throws IllegalArgumentException {
         return spendingRepository.saveAll(spendingList
                 .stream()
                 .map(SpendingRequest::toEntity)
@@ -30,21 +35,31 @@ public class SpendingService {
                 .collect(Collectors.toList());
     }
 
-    public List<SpendingResponse> listAll(Optional<Long> limit) {
-        var spendings = spendingRepository
-                .findAll();
-
+    public List<SpendingResponse> listAll(Optional<Long> limit) throws IllegalArgumentException {
+        List<SpendingEntity> spendings;
+        if (limit.isPresent()) {
+            if (limit.get() < 0) {
+                throw new IllegalArgumentException("Illegal limit exception. Cannot be " + limit.get());
+            } else {
+                spendings = spendingRepository.findAll(PageRequest.of(0, limit.get().intValue()
+                        , Sort.by(Sort.Direction.DESC, "id"))).getContent();
+            }
+        } else {
+            spendings = spendingRepository.findAll(Sort.by(Sort.Direction.DESC, "id"));
+        }
         return spendings.stream()
-                .limit(limit.filter(lim -> lim >= 0).orElse((long) spendings.size()))
                 .map(SpendingResponse::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public SpendingGroupedResponse getGroupedFrom(Long from) {
+    public SpendingGroupedResponse getGroupedFrom(Long from) throws IllegalArgumentException {
         var now = LocalDate.now();
+        if (from < 0) {
+            throw new IllegalArgumentException("Illegal bound exception. Cannot be " + from);
+        }
         return SpendingGroupedResponse
                 .fromEntity(spendingRepository
-                        .findAllByCreatedBetween(now.minusDays(Math.abs(from)), now)
+                        .findAllByCreatedBetween(now.minusDays(from), now)
                 );
     }
 }

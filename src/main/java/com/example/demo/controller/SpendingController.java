@@ -19,17 +19,17 @@ public class SpendingController {
     private SpendingService spendingService;
 
     @PostMapping
-    public List<SpendingResponse> spendSomeMoney(@Valid @RequestBody List<SpendingRequest> spendings){
+    public List<SpendingResponse> spendSomeMoney(@Valid @RequestBody List<SpendingRequest> spendings) {
         return spendingService.spendSomeMoney(spendings);
     }
 
     @GetMapping
-    public List<SpendingResponse> getAll(@RequestParam(required = false) Long limit){
+    public List<SpendingResponse> getAll(@RequestParam(required = false) Long limit) throws IllegalArgumentException {
         return spendingService.listAll(Optional.ofNullable(limit));
     }
 
     @GetMapping("/grouped")
-    public SpendingGroupedResponse getGroupedFrom(@RequestParam Long daysBefore){
+    public SpendingGroupedResponse getGroupedFrom(@RequestParam Long daysBefore) throws IllegalArgumentException {
         return spendingService.getGroupedFrom(daysBefore);
     }
 }

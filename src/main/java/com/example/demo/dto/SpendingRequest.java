@@ -16,7 +16,10 @@ public class SpendingRequest {
     @NotNull
     private Long cost;
 
-    public SpendingEntity toEntity(){
+    public SpendingEntity toEntity() throws IllegalArgumentException {
+        if (cost <= 0) {
+            throw new IllegalArgumentException(spendingTitle + " cannot cost less than 0. Your input is: " + cost);
+        }
         return SpendingEntity.builder()
                 .name(spendingTitle)
                 .cost(cost)

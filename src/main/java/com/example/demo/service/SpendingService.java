@@ -24,7 +24,7 @@ public class SpendingService {
         this.spendingRepository = spendingRepository;
     }
 
-    public List<SpendingResponse> spendSomeMoney(List<SpendingRequest> spendingList) {
+    public List<SpendingResponse> spendSomeMoney(List<SpendingRequest> spendingList) throws IllegalArgumentException {
         return spendingRepository.saveAll(spendingList
                 .stream()
                 .map(SpendingRequest::toEntity)

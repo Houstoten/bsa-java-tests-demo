@@ -19,7 +19,8 @@ public class SpendingController {
     private SpendingService spendingService;
 
     @PostMapping
-    public List<SpendingResponse> spendSomeMoney(@Valid @RequestBody List<SpendingRequest> spendings) {
+    public List<SpendingResponse> spendSomeMoney(@Valid @RequestBody List<SpendingRequest> spendings)
+            throws IllegalArgumentException {
         return spendingService.spendSomeMoney(spendings);
     }
 

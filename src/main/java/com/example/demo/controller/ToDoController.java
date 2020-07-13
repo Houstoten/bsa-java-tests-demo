@@ -1,8 +1,11 @@
 package com.example.demo.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.example.demo.exception.ModificationForbiddenException;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
@@ -12,48 +15,43 @@ import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.service.ToDoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 
 @RestController
+@RequestMapping("/todos")
 public class ToDoController {
 
-	@Autowired
-	ToDoService toDoService;
-	
-	@ExceptionHandler({ ToDoNotFoundException.class })
-	public String handleException(Exception ex) {
-		return ex.getMessage();
-	}
-	
-	@GetMapping("/todos")
-	@Valid List<ToDoResponse> getAll() {
-		return toDoService.getAll();
-	}
+    @Autowired
+    ToDoService toDoService;
 
-	@PostMapping("/todos")
-	@Valid ToDoResponse save(@Valid @RequestBody ToDoSaveRequest todoSaveRequest) throws ToDoNotFoundException {
-		return toDoService.upsert(todoSaveRequest);
-	}
+    @GetMapping
+    @Valid List<ToDoResponse> getAll() {
+        return toDoService.getAll();
+    }
 
-	@PutMapping("/todos/{id}/complete")
-	@Valid ToDoResponse save(@PathVariable Long id) throws ToDoNotFoundException {
-		return toDoService.completeToDo(id);
-	}
+    @PostMapping
+    @Valid ToDoResponse save(@Valid @RequestBody ToDoSaveRequest todoSaveRequest) throws ToDoNotFoundException {
+        return toDoService.upsert(todoSaveRequest);
+    }
 
-	@GetMapping("/todos/{id}")
-	@Valid ToDoResponse getOne(@PathVariable Long id) throws ToDoNotFoundException {
-		return toDoService.getOne(id);
-	}
+    @PutMapping("/{id}/complete")
+    @Valid ToDoResponse save(@PathVariable Long id) throws ToDoNotFoundException {
+        return toDoService.completeToDo(id);
+    }
 
-	@DeleteMapping("/todos/{id}")
-	void delete(@PathVariable Long id) {
-		toDoService.deleteOne(id);
-	}
+    @GetMapping("/{id}")
+    @Valid ToDoResponse getOne(@PathVariable Long id) throws ToDoNotFoundException {
+        return toDoService.getOne(id);
+    }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{id}")
+    void delete(@PathVariable Long id, @RequestParam UUID admin) throws ModificationForbiddenException {
+        toDoService.deleteOne(id, admin);
+    }
+
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping
+    void deleteAll(@RequestParam UUID admin) throws ModificationForbiddenException {
+        toDoService.deleteAll(admin);
+    }
 }

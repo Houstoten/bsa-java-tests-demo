@@ -23,11 +23,6 @@ public class ToDoController {
     @Autowired
     ToDoService toDoService;
 
-    @ExceptionHandler({ToDoNotFoundException.class})
-    public String handleException(Exception ex) {
-        return ex.getMessage();
-    }
-
     @GetMapping
     @Valid List<ToDoResponse> getAll() {
         return toDoService.getAll();

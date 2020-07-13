@@ -4,6 +4,7 @@ import com.example.demo.dto.SpendingGroupedResponse;
 import com.example.demo.dto.SpendingRequest;
 import com.example.demo.dto.SpendingResponse;
 import com.example.demo.exception.ModificationForbiddenException;
+import com.example.demo.exception.ToDoNotFoundException;
 import com.example.demo.service.SpendingService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,6 +21,12 @@ public class SpendingController {
 
     @Autowired
     private SpendingService spendingService;
+
+    @ResponseStatus(HttpStatus.BAD_REQUEST)
+    @ExceptionHandler({IllegalArgumentException.class})
+    public String handleException(Exception ex) {
+        return ex.getMessage();
+    }
 
     @PostMapping
     public List<SpendingResponse> spendSomeMoney(@Valid @RequestBody List<SpendingRequest> spendings)

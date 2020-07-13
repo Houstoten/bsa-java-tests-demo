@@ -4,7 +4,6 @@ import com.example.demo.dto.SpendingGroupedResponse;
 import com.example.demo.dto.SpendingRequest;
 import com.example.demo.dto.SpendingResponse;
 import com.example.demo.exception.ModificationForbiddenException;
-import com.example.demo.model.SpendingEntity;
 import com.example.demo.repository.AdminRepository;
 import com.example.demo.repository.SpendingRepository;
 import org.junit.jupiter.api.BeforeEach;
